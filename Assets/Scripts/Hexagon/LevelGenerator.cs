@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace DefaultNamespace
+namespace Hexagon
 {
     public class LevelGenerator : MonoBehaviour
     {
@@ -51,36 +50,36 @@ namespace DefaultNamespace
 
                     // In odd columns check if there is 2-Neighbors with the same color.
                     // If so, exclude that color in random number creation in Hex being created at the moment
-                    if (hex.HasNeighborHex(HexSides.BottomLeft))
+                    if (hex.HasNeighborHex(HexagonEdges.BottomLeft))
                     {
-                        if (hex.GetNeighbor(HexSides.BottomLeft).hexType ==
-                            hex.GetNeighbor(HexSides.TopLeft).hexType)
+                        if (hex.GetNeighbor(HexagonEdges.BottomLeft).hexType ==
+                            hex.GetNeighbor(HexagonEdges.TopLeft).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexSides.BottomLeft).hexType);
+                            excluding.Add(hex.GetNeighbor(HexagonEdges.BottomLeft).hexType);
                         }
                     }
-                    if (hex.HasNeighborHex(HexSides.BottomRight))
+                    if (hex.HasNeighborHex(HexagonEdges.BottomRight))
                     {
-                        if (hex.GetNeighbor(HexSides.BottomRight).hexType ==
-                            hex.GetNeighbor(HexSides.TopRight).hexType)
+                        if (hex.GetNeighbor(HexagonEdges.BottomRight).hexType ==
+                            hex.GetNeighbor(HexagonEdges.TopRight).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexSides.TopRight).hexType);
+                            excluding.Add(hex.GetNeighbor(HexagonEdges.TopRight).hexType);
                         }
                     }
 
-                    if (hex.HasNeighborHex(HexSides.Top))
+                    if (hex.HasNeighborHex(HexagonEdges.Top))
                     {
-                        if (hex.GetNeighbor(HexSides.Top).hexType ==
-                            hex.GetNeighbor(HexSides.TopLeft).hexType)
+                        if (hex.GetNeighbor(HexagonEdges.Top).hexType ==
+                            hex.GetNeighbor(HexagonEdges.TopLeft).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexSides.Top).hexType);
+                            excluding.Add(hex.GetNeighbor(HexagonEdges.Top).hexType);
                         }
 
-                        if (hex.HasNeighborHex(HexSides.TopRight) && 
-                            hex.GetNeighbor(HexSides.Top).hexType ==
-                            hex.GetNeighbor(HexSides.TopRight).hexType)
+                        if (hex.HasNeighborHex(HexagonEdges.TopRight) && 
+                            hex.GetNeighbor(HexagonEdges.Top).hexType ==
+                            hex.GetNeighbor(HexagonEdges.TopRight).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexSides.Top).hexType);
+                            excluding.Add(hex.GetNeighbor(HexagonEdges.Top).hexType);
                             
                         }
                     }

@@ -1,35 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Hexagon;
 
 namespace Selection
 {
-    public class SelectionAreaIterator : IEnumerable<SelectionAreas>
+    public class SelectionAreaIterator : IEnumerable<HexagonVertexes>
     {
-        private SelectionAreas _selectionArea;
+        private HexagonVertexes _hexagonVertex;
 
         private int count = 0;
 
-        public SelectionAreaIterator(SelectionAreas selectionArea)
+        public SelectionAreaIterator(HexagonVertexes hexagonVertex)
         {
-            _selectionArea = selectionArea;
+            _hexagonVertex = hexagonVertex;
         }
 
 
-        public IEnumerator<SelectionAreas> GetEnumerator()
+        public IEnumerator<HexagonVertexes> GetEnumerator()
         {
-            SelectionAreas clockwise = _selectionArea,
-                counterClockwise = _selectionArea;
-            yield return _selectionArea;
+            HexagonVertexes clockwise = _hexagonVertex,
+                counterClockwise = _hexagonVertex;
+            yield return _hexagonVertex;
             for (count = 0; count < 5; count++)
             {
                 if (count % 2 == 0)
                 {
-                    clockwise = SelectionAreasUtility.Next(clockwise);
+                    clockwise = clockwise.Next();
                     yield return clockwise;
                 }
                 else
                 {
-                    counterClockwise = SelectionAreasUtility.Next(counterClockwise, false);
+                    counterClockwise = counterClockwise.Next(false);
                     yield return counterClockwise;
                 }
             }

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-namespace DefaultNamespace
+namespace Hexagon
 {
     public class Board : MonoBehaviour
     {
@@ -45,17 +43,17 @@ namespace DefaultNamespace
             _board[row, column] = hex;
         }
 
-        public bool CheckMatchNeighborClockwise(Hex hex, HexSides hexSides)
+        public bool CheckMatchNeighborClockwise(Hex hex, HexagonEdges hexagonEdges)
         {
             // If there is no tile in directions, return false
-            if (hex.HasNeighborHex(hexSides) ||
-                hex.HasNeighborHex(Hex.nextDirectionClockwise[hexSides]))
+            if (hex.HasNeighborHex(hexagonEdges) ||
+                hex.HasNeighborHex(hexagonEdges.Next()))
             {
                 return false;
             }
             // Otherwise, check other hex tiles for match
-            Vector2Int hex1Position = hex.position + Hex.directionToVector[hexSides],
-                hex2Position = hex.position + Hex.directionToVector[Hex.nextDirectionClockwise[hexSides]];
+            Vector2Int hex1Position = hex.position + Hex.directionToVector[hexagonEdges],
+                hex2Position = hex.position + Hex.directionToVector[hexagonEdges.Next()];
             Hex hex1 = GetElement(hex1Position),
                 hex2 = GetElement(hex2Position);
 

@@ -1,4 +1,4 @@
-﻿using DefaultNamespace;
+﻿using Hexagon;
 using UnityEngine;
 
 namespace Selection
@@ -11,27 +11,27 @@ namespace Selection
         private bool isLeft;
         private Vector2 rotationPoint;
 
-        public void SelectHex(Hex hex, SelectionAreas selectionArea)
+        public void SelectHex(Hex hex, HexagonVertexes hexagonVertex)
         {
             _selectedHex = hex;
 
-            if (selectionArea == SelectionAreas.BottomLeft)
+            if (hexagonVertex == HexagonVertexes.BottomLeft)
             {
-                hex = hex.GetNeighbor(HexSides.BottomLeft);
+                hex = hex.GetNeighbor(HexagonEdges.BottomLeft);
                 isLeft = false;
-            } else if (selectionArea == SelectionAreas.BottomRight)
+            } else if (hexagonVertex == HexagonVertexes.BottomRight)
             {
-                hex = hex.GetNeighbor(HexSides.BottomRight);
+                hex = hex.GetNeighbor(HexagonEdges.BottomRight);
                 isLeft = true;
-            } else if (selectionArea == SelectionAreas.TopLeft)
+            } else if (hexagonVertex == HexagonVertexes.TopLeft)
             {
-                hex = hex.GetNeighbor(HexSides.TopLeft);
+                hex = hex.GetNeighbor(HexagonEdges.TopLeft);
                 isLeft = false;
-            } else if (selectionArea == SelectionAreas.TopRight)
+            } else if (hexagonVertex == HexagonVertexes.TopRight)
             {
-                hex = hex.GetNeighbor(HexSides.TopRight);
+                hex = hex.GetNeighbor(HexagonEdges.TopRight);
                 isLeft = true;
-            } else if (selectionArea == SelectionAreas.Right)
+            } else if (hexagonVertex == HexagonVertexes.Right)
             {
                 isLeft = false;
             } else

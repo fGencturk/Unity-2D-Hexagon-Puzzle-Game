@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DefaultNamespace;
+using Hexagon;
 using Selection;
 using UnityEngine;
 
@@ -40,28 +40,28 @@ namespace Controller
             indexes.y = Mathf.Clamp(indexes.y, 0, Board.instance.boardSize.y * 2 - 1);
 
             Hex hex = Board.instance.GetElement(indexes);
-            SelectionAreas selectionArea = hex.GetSelectionSide(mousePos);
-            selectionArea = HandleEdgeCases(hex, selectionArea);
-            _selectionHandler.SelectHex(hex, selectionArea);
+            HexagonVertexes hexagonVertex = hex.GetSelectionSide(mousePos);
+            hexagonVertex = HandleEdgeCases(hex, hexagonVertex);
+            _selectionHandler.SelectHex(hex, hexagonVertex);
         }
 
-        SelectionAreas HandleEdgeCases(Hex hex, SelectionAreas selectionArea)
+        HexagonVertexes HandleEdgeCases(Hex hex, HexagonVertexes hexagonVertex)
         {
-            SelectionAreas outSelectionArea = selectionArea;
-            foreach(var item in new SelectionAreaIterator(outSelectionArea))
+            HexagonVertexes outHexagonVertex = hexagonVertex;
+            foreach(var item in new SelectionAreaIterator(outHexagonVertex))
             {
-                outSelectionArea = item;
-                if (HasRequiredNeighbors(hex, outSelectionArea))
+                outHexagonVertex = item;
+                if (HasRequiredNeighbors(hex, outHexagonVertex))
                 {
                     break;
                 }
             }
-            return outSelectionArea;
+            return outHexagonVertex;
         }
         
-        bool HasRequiredNeighbors(Hex hex, SelectionAreas selectionArea)
+        bool HasRequiredNeighbors(Hex hex, HexagonVertexes hexagonVertex)
         {
-            List<HexSides> requiredNeighbors = SelectionAreasUtility.GetRequiredNeighbors(selectionArea);
+            List<HexagonEdges> requiredNeighbors = hexagonVertex.GetNeighborEdges();
             foreach (var hexSide in requiredNeighbors)
             {
                 if (!hex.HasNeighborHex(hexSide))
