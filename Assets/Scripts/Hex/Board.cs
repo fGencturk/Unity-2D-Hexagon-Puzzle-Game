@@ -45,17 +45,17 @@ namespace DefaultNamespace
             _board[row, column] = hex;
         }
 
-        public bool CheckMatchNeighborClockwise(Hex hex, HexDirection hexDirection)
+        public bool CheckMatchNeighborClockwise(Hex hex, HexSides hexSides)
         {
             // If there is no tile in directions, return false
-            if (hex.HasNeighborHex(hexDirection) ||
-                hex.HasNeighborHex(Hex.nextDirectionClockwise[hexDirection]))
+            if (hex.HasNeighborHex(hexSides) ||
+                hex.HasNeighborHex(Hex.nextDirectionClockwise[hexSides]))
             {
                 return false;
             }
             // Otherwise, check other hex tiles for match
-            Vector2Int hex1Position = hex.position + Hex.directionToVector[hexDirection],
-                hex2Position = hex.position + Hex.directionToVector[Hex.nextDirectionClockwise[hexDirection]];
+            Vector2Int hex1Position = hex.position + Hex.directionToVector[hexSides],
+                hex2Position = hex.position + Hex.directionToVector[Hex.nextDirectionClockwise[hexSides]];
             Hex hex1 = GetElement(hex1Position),
                 hex2 = GetElement(hex2Position);
 

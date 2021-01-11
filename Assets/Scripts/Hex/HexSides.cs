@@ -1,6 +1,6 @@
 ﻿namespace DefaultNamespace
 {
-    public enum HexDirection
+    public enum HexSides
     {
         Top,
         TopLeft,

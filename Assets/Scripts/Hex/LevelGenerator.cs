@@ -51,36 +51,36 @@ namespace DefaultNamespace
 
                     // In odd columns check if there is 2-Neighbors with the same color.
                     // If so, exclude that color in random number creation in Hex being created at the moment
-                    if (hex.HasNeighborHex(HexDirection.BottomLeft))
+                    if (hex.HasNeighborHex(HexSides.BottomLeft))
                     {
-                        if (hex.GetNeighbor(HexDirection.BottomLeft).hexType ==
-                            hex.GetNeighbor(HexDirection.TopLeft).hexType)
+                        if (hex.GetNeighbor(HexSides.BottomLeft).hexType ==
+                            hex.GetNeighbor(HexSides.TopLeft).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexDirection.BottomLeft).hexType);
+                            excluding.Add(hex.GetNeighbor(HexSides.BottomLeft).hexType);
                         }
                     }
-                    if (hex.HasNeighborHex(HexDirection.BottomRight))
+                    if (hex.HasNeighborHex(HexSides.BottomRight))
                     {
-                        if (hex.GetNeighbor(HexDirection.BottomRight).hexType ==
-                            hex.GetNeighbor(HexDirection.TopRight).hexType)
+                        if (hex.GetNeighbor(HexSides.BottomRight).hexType ==
+                            hex.GetNeighbor(HexSides.TopRight).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexDirection.TopRight).hexType);
+                            excluding.Add(hex.GetNeighbor(HexSides.TopRight).hexType);
                         }
                     }
 
-                    if (hex.HasNeighborHex(HexDirection.Top))
+                    if (hex.HasNeighborHex(HexSides.Top))
                     {
-                        if (hex.GetNeighbor(HexDirection.Top).hexType ==
-                            hex.GetNeighbor(HexDirection.TopLeft).hexType)
+                        if (hex.GetNeighbor(HexSides.Top).hexType ==
+                            hex.GetNeighbor(HexSides.TopLeft).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexDirection.Top).hexType);
+                            excluding.Add(hex.GetNeighbor(HexSides.Top).hexType);
                         }
 
-                        if (hex.HasNeighborHex(HexDirection.TopRight) && 
-                            hex.GetNeighbor(HexDirection.Top).hexType ==
-                            hex.GetNeighbor(HexDirection.TopRight).hexType)
+                        if (hex.HasNeighborHex(HexSides.TopRight) && 
+                            hex.GetNeighbor(HexSides.Top).hexType ==
+                            hex.GetNeighbor(HexSides.TopRight).hexType)
                         {
-                            excluding.Add(hex.GetNeighbor(HexDirection.Top).hexType);
+                            excluding.Add(hex.GetNeighbor(HexSides.Top).hexType);
                             
                         }
                     }
