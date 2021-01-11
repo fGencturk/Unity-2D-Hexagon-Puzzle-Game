@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808713e32ec24f4d9f0dfee7f0a815a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardSize: {x: 8, y: 9}
+  boardSize: {x: 8, y: 9}
   sprites:
   - {fileID: 5578019867964630824, guid: e95bb67222949d04a96306503a3253df, type: 3}
   - {fileID: 5779457914614746158, guid: 498c39379333fce40b1424e0bb90d273, type: 3}
@@ -298,7 +298,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2f417b8fec04640907b02f2a4dba419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _board: {fileID: 1398271429}
 --- !u!4 &1422660962
 Transform:
   m_ObjectHideFlags: 0
