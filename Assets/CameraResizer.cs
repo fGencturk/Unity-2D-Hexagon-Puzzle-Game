@@ -14,15 +14,17 @@ public class CameraResizer : MonoBehaviour
     {
         float screenRatio = Screen.width / (float)Screen.height;
         Vector2 boardSize = board.GetBoardSizeInUnits();
-        float widthMultiplier = 1 + horizontalMargin * 2;
-        float targetRatio = boardSize.x * widthMultiplier / boardSize.y;
+        float targetRatio = boardSize.x / boardSize.y;
+        
+        float divider = 2 - horizontalMargin * 2;
+        
         if (screenRatio >= targetRatio)
         {
-            Camera.main.orthographicSize = boardSize.y / 2;
+            Camera.main.orthographicSize = boardSize.y / divider;
         }
         else
         {
-            Camera.main.orthographicSize = boardSize.y / 2 * (targetRatio / screenRatio);
+            Camera.main.orthographicSize = boardSize.y / divider * (targetRatio / screenRatio);
         }
     }
 
