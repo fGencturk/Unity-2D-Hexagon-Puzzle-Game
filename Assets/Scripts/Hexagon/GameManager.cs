@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 using Utility;
 using Random = UnityEngine.Random;
@@ -27,8 +29,9 @@ namespace Hexagon
         [SerializeField] private Vector2Int boardSize = new Vector2Int(8,9);
         [SerializeField] private bool forceRewindAfterNoMatch = true;
         [SerializeField] private LevelGenerator levelGenerator;
-        
 
+        public UnityAction<int> onHexagonGroupExplode = delegate(int count) {  };
+        public UnityAction onGameOver = delegate() {  };
 
         private Dictionary<int, Hex> _explodedHexs = new Dictionary<int, Hex>();
         private Board _board;
@@ -56,6 +59,56 @@ namespace Hexagon
             
             levelGenerator.FillBoard();
             canTakeAction = true;
+        }
+
+        private bool IsThereAnyMoveLeft()
+        {
+            List<Hex> neighbors = new List<Hex>();
+            
+            for (int column = 0; column < boardSize.x; column++)
+            {
+                int firstElementRow = column % 2 == 0 ? 0 : 1;
+                Hex element = _board.GetElement(firstElementRow, column);
+
+                while (true)
+                {
+                    neighbors.Add(element);
+                    foreach (HexagonEdges edge in Enum.GetValues(typeof(HexagonEdges)))
+                    {
+                        if (element.HasNeighborHex(edge))
+                        {
+                            neighbors.Add(element.GetNeighbor(edge));
+                        }
+                    }
+                    Dictionary<int, int> hexTypeCount = new Dictionary<int, int>();
+                    // There should be 3 Hexagons with the same TYPE in all neighbors including center hexagon
+                    // So that there is a possible move
+                    foreach (var neighbor in neighbors)
+                    {
+                        hexTypeCount[neighbor.hexType] = hexTypeCount.ContainsKey(neighbor.hexType)
+                            ? hexTypeCount[neighbor.hexType] + 1
+                            : 1;
+                    }
+
+                    foreach (var count in hexTypeCount.Values)
+                    {
+                        if (count >= 3)
+                        {
+                            return true;
+                        }
+                    }
+
+                    neighbors.Clear();
+                    if (!element.HasNeighborHex(HexagonEdges.Bottom))
+                    {
+                        break;
+                    }
+
+                    element = element.GetNeighbor(HexagonEdges.Bottom);
+                }
+            }
+
+            return false;
         }
         
         public void Rotate(Hex hex, HexagonEdges firstNeighbor, bool clockwise = true)
@@ -124,6 +177,7 @@ namespace Hexagon
                     canTakeAction = true;
                     break;
                 }
+                onHexagonGroupExplode(_explodedHexs.Count);
 
                 isThereMatch = true;
                 
@@ -131,8 +185,20 @@ namespace Hexagon
                 CreateNewHexes();
                 DestroyExplodedHexes();
             } while (true);
+
+            if (!IsThereAnyMoveLeft())
+            {
+                TriggerGameOver();
+            }
         }
-        
+
+        private void TriggerGameOver()
+        {
+            Debug.Log("Gameover");
+            canTakeAction = false;
+            onGameOver();
+        }
+
         private void DestroyExplodedHexes()
         {
             foreach (var hex in _explodedHexs.Values)
