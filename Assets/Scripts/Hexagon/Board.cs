@@ -3,28 +3,18 @@ using UnityEngine;
 
 namespace Hexagon
 {
-    public class Board : MonoBehaviour
+    public class Board
     {
-        public static readonly float XMovementMultiplier = .75f; // 0.75 is constant for (distance between hexagons in the grid) / (hexagon width)
-        
         // Although board keeps elements in two dimensional array, it exposes them as a array with doubled-coordinates
         // private Hex[,] _board and GetElement function achieves this behavior.
         // See Representation : https://pbs.twimg.com/media/Dd7Gk-FVQAEYryG.jpg "double-height"
-        [SerializeField] public Vector2Int boardSize = new Vector2Int(8,9);
-        [SerializeField] public List<GameObject> sprites;
-        
-        public static Board instance { get; private set; }
-        
         private Hex[,] _board;
-        private Vector2 _spriteSize;
-        public void Awake()
+        private Vector2Int _boardSize;
+        
+        public Board(Vector2Int boardSize)
         {
-            instance = this;
-            _board = new Hex[boardSize.y, boardSize.x];
-            
-            // Assuming all sprites have the same width and height
-            SpriteRenderer spriteRenderer = sprites[0].GetComponent<SpriteRenderer>();
-            _spriteSize = spriteRenderer.bounds.size;
+            _boardSize = boardSize;
+            _board = new Hex[this._boardSize.y, this._boardSize.x];
         }
 
         public Hex GetElement(int row, int column)
@@ -39,36 +29,14 @@ namespace Hexagon
 
         public void SetElement(int row, int column, Hex hex)
         {
+            hex.ChangeIndex(new Vector2Int(column, row));
             row = row / 2;
             _board[row, column] = hex;
         }
 
-        public bool CheckMatchNeighborClockwise(Hex hex, HexagonEdges hexagonEdges)
+        public void SetElement(Vector2Int pos, Hex hex)
         {
-            // If there is no tile in directions, return false
-            if (hex.HasNeighborHex(hexagonEdges) ||
-                hex.HasNeighborHex(hexagonEdges.Next()))
-            {
-                return false;
-            }
-            // Otherwise, check other hex tiles for match
-            Vector2Int hex1Position = hex.position + Hex.directionToVector[hexagonEdges],
-                hex2Position = hex.position + Hex.directionToVector[hexagonEdges.Next()];
-            Hex hex1 = GetElement(hex1Position),
-                hex2 = GetElement(hex2Position);
-
-            return hex.hexType == hex1.hexType && hex.hexType == hex2.hexType;
-        }
-
-        public Vector2 GetBoardSizeInUnits()
-        {
-            Vector2 spriteSize = GetSpriteSizeInUnits();
-            return new Vector2(spriteSize.x * XMovementMultiplier * (boardSize.x - 1) + spriteSize.x, spriteSize.y * (boardSize.y + 0.5f));
-        }
-
-        public Vector2 GetSpriteSizeInUnits()
-        {
-            return _spriteSize;
+            SetElement(pos.y, pos.x, hex);
         }
     }
 }

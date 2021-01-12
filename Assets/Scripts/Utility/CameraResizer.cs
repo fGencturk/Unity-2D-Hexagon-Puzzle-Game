@@ -13,7 +13,7 @@ namespace Utility
         void Start()
         {
             float screenRatio = Screen.width / (float)Screen.height;
-            Vector2 boardSize = board.GetBoardSizeInUnits();
+            Vector2 boardSize = GameManager.instance.positionCalculator.GetBoardSizeInUnits();
             float targetRatio = boardSize.x / boardSize.y;
         
             float divider = 2 - horizontalMargin * 2;

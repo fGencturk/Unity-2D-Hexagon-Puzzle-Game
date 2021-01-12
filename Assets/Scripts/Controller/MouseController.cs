@@ -2,47 +2,50 @@
 using Hexagon;
 using Selection;
 using UnityEngine;
+using Utility;
 
 namespace Controller
 {
     public class MouseController : MonoBehaviour
     {
-        private Vector2 _firstHexPosition,
-            _spriteSize;
-
         [SerializeField] private SelectionHandler _selectionHandler;
+        
+        private HexPositionCalculator _hexPositionCalculator;
+        private Vector2 _firstHexPosition, _lastHexPosition;
+        private Camera _camera;
 
+        void Start()
+        {
+            _camera = Camera.main;
+            _hexPositionCalculator = GameManager.instance.positionCalculator;
+            _firstHexPosition = _hexPositionCalculator.firstPosition;
+            _lastHexPosition = _hexPositionCalculator.lastPosition;
+        }
+        
         // Update is called once per frame
         void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Vector2 position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                _firstHexPosition = Board.instance.GetElement(0, 0).gameObject.transform.position;
-                _spriteSize = Board.instance.GetSpriteSizeInUnits();
-                HandleRows(_firstHexPosition, position);
+                Vector2 mousePositionWorldPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
+                if (mousePositionWorldPoint.x < _firstHexPosition.x || mousePositionWorldPoint.y > _firstHexPosition.y ||
+                    mousePositionWorldPoint.x > _lastHexPosition.x || mousePositionWorldPoint.y < _lastHexPosition.y)
+                {
+                    return;
+                }
+                
+                Vector2 mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+                RaycastHit2D hitInfo = Physics2D.Raycast(_camera.ScreenToWorldPoint(mousePosition), Vector2.zero);
+                
+                if(hitInfo)
+                {
+                    Hex hex = hitInfo.transform.gameObject.GetComponent<Hex>();
+                    
+                    HexagonVertexes hexagonVertex = hex.GetSelectionSide(mousePositionWorldPoint);
+                    hexagonVertex = HandleEdgeCases(hex, hexagonVertex);
+                    _selectionHandler.SelectHex(hex, hexagonVertex);
+                }
             }
-        }
-
-        void HandleRows(Vector2 initialPos, Vector2 mousePos)
-        {
-            // Finding index of the clicked hexagon
-            Vector2 relativePos = mousePos - initialPos;
-            relativePos.y = -relativePos.y;
-            float xDifference = _spriteSize.x * Board.XMovementMultiplier,
-                yDifference = _spriteSize.y / 2;
-            Vector2Int indexes = new Vector2Int((int) (relativePos.x / xDifference) , (int) (relativePos.y / yDifference));
-
-            indexes.y += indexes.x % 2 == 1 ? 1 : 0;
-            indexes.y = indexes.y / 2 * 2;
-            indexes.y += indexes.x % 2 == 1 ? -1 : 0;
-            indexes.x = Mathf.Clamp(indexes.x, 0, Board.instance.boardSize.x - 1);
-            indexes.y = Mathf.Clamp(indexes.y, 0, Board.instance.boardSize.y * 2 - 1);
-
-            Hex hex = Board.instance.GetElement(indexes);
-            HexagonVertexes hexagonVertex = hex.GetSelectionSide(mousePos);
-            hexagonVertex = HandleEdgeCases(hex, hexagonVertex);
-            _selectionHandler.SelectHex(hex, hexagonVertex);
         }
 
         HexagonVertexes HandleEdgeCases(Hex hex, HexagonVertexes hexagonVertex)
