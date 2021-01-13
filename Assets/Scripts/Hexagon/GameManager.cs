@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Hexagon.HexCreator;
+using UI;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -23,18 +25,25 @@ namespace Hexagon
         [HideInInspector] public bool canTakeAction = false;
         
         [SerializeField] public List<GameObject> hexPrefabs;
+        [SerializeField] public BombWidget bombWidgetPrefab;
         [SerializeField] public float hexMoveAnimationDuration = 2f;
         public HexPositionCalculator positionCalculator { get; private set; }
         
         [SerializeField] private Vector2Int boardSize = new Vector2Int(8,9);
         [SerializeField] private bool forceRewindAfterNoMatch = true;
         [SerializeField] private LevelGenerator levelGenerator;
+        [SerializeField] private RandomHexCreator hexCreator;
 
         public UnityAction<int> onHexagonGroupExplode = delegate(int count) {  };
         public UnityAction onGameOver = delegate() {  };
+        public UnityAction onRestart = delegate() {  };
+        public delegate void OnPlayerActionEndDelegate ();
+        public event OnPlayerActionEndDelegate OnPlayerActionEnd = () => {};
+        
 
         private Dictionary<int, Hex> _explodedHexs = new Dictionary<int, Hex>();
         private Board _board;
+        
         public Hex GetElement(Vector2Int indexes)
         {
             return _board.GetElement(indexes);
@@ -55,6 +64,11 @@ namespace Hexagon
             Vector2 hexagonSize = spriteRenderer.bounds.size;
             
             positionCalculator = new HexPositionCalculator(boardSize, hexagonSize);
+            Initialize();
+        }
+
+        void Initialize()
+        {
             _board = new Board(boardSize);
             
             levelGenerator.FillBoard();
@@ -186,15 +200,19 @@ namespace Hexagon
                 DestroyExplodedHexes();
             } while (true);
 
+            if (isThereMatch)
+            {
+                OnPlayerActionEnd();
+            }
+
             if (!IsThereAnyMoveLeft())
             {
                 TriggerGameOver();
             }
         }
 
-        private void TriggerGameOver()
+        public void TriggerGameOver()
         {
-            Debug.Log("Gameover");
             canTakeAction = false;
             onGameOver();
         }
@@ -231,19 +249,17 @@ namespace Hexagon
                 for (int row = startRow; row < rowCount * 2; row += 2)
                 {
                     Vector2Int position = new Vector2Int(column, row);
-                    CreateNewHex(position);
+                    CreateHexGameObject(position);
                 }
             }
             
         }
 
-        private void CreateNewHex(Vector2Int position)
+        public Hex CreateHexGameObject(Vector2Int position)
         {
-            int type = Random.Range(0, hexPrefabs.Count);
-            GameObject hexGameObject = Instantiate(hexPrefabs[type], new Vector2(0, 10f), Quaternion.identity, transform) as GameObject;
-            Hex hex = hexGameObject.AddComponent<Hex>();
-            hex.Initialize(new Vector2Int(position.x, position.y), type );
+            Hex hex = hexCreator.CreateHexGameObject(position);
             _board.SetElement(position, hex);
+            return hex;
         }
 
         private void ShiftBoard()
@@ -339,14 +355,14 @@ namespace Hexagon
             return hex.hexType == hex1.hexType && hex.hexType == hex2.hexType;
         }
 
-        public Hex CreateHexGameObject(Vector2Int indexes, int type)
+        public void TriggerRestart()
         {
-            Vector2 position = positionCalculator.GetPosition(indexes);
-            GameObject hexGameObject = Instantiate(GameManager.instance.hexPrefabs[type], position, Quaternion.identity, transform) as GameObject;
-            Hex hex = hexGameObject.AddComponent<Hex>();
-            hex.Initialize(indexes, type);
-            _board.SetElement(indexes, hex);
-            return hex;
+            foreach(Transform child in hexCreator.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            onRestart();
+            Initialize();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hexagon;
+﻿using System;
+using Hexagon;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,8 @@ namespace UI
 {
     public class ScoreManager : MonoBehaviour
     {
+        public static ScoreManager instance;
+        
         [SerializeField] private Text currentScoreText,
             highestScoreText;
         [SerializeField] public int scorePerHex = 5;
@@ -15,10 +18,21 @@ namespace UI
 
         private string _highScoreEmptyText;
         private int _highestScore;
-    
+
+        private void Awake()
+        {
+            if (instance)
+            {
+                Debug.LogError("There is already a ScoreManager instance. Destroying self.");
+                Destroy(gameObject);
+                return;
+            }
+            instance = this;
+        }
+
         void Start()
         {
-            currentScore = 0;
+            SetCurrentScore(0);
             _highScoreEmptyText = highestScoreText.text;
             _highestScore = PlayerPrefs.GetInt(highestScoreKey, -1);
             if (_highestScore == -1)
@@ -27,14 +41,26 @@ namespace UI
             }
 
             GameManager.instance.onHexagonGroupExplode += OnScore;
+            GameManager.instance.onGameOver += OnGameOver;
+            GameManager.instance.onRestart += OnRestart;
         }
 
         public void OnScore(int count)
         {
-            currentScore += count * scorePerHex;
-            currentScoreText.text = currentScore.ToString();
+            SetCurrentScore(currentScore + count * scorePerHex);
         }
 
+        void OnRestart()
+        {
+            SetCurrentScore(0);
+        }
+
+        void SetCurrentScore(int score)
+        {
+            currentScore = score;
+            currentScoreText.text = currentScore.ToString();
+        }
+        
         public void OnGameOver()
         {
             if (currentScore > _highestScore)

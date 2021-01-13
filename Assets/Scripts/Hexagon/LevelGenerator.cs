@@ -17,8 +17,7 @@ namespace Hexagon
             {
                 for (int c = 0; c < positionCalculator.boardSize.x; c += 2)
                 {
-                    int createdType = GetRandomIndex();
-                    GameManager.instance.CreateHexGameObject( new Vector2Int(c, r), createdType);
+                    GameManager.instance.CreateHexGameObject(new Vector2Int(c, r));
                 }
             }
             // Fill odd-columns
@@ -26,7 +25,7 @@ namespace Hexagon
             {
                 for (int c = 1; c < positionCalculator.boardSize.x; c += 2)
                 {
-                    Hex hex = GameManager.instance.CreateHexGameObject( new Vector2Int(c, r), 0);
+                    Hex hex = GameManager.instance.CreateHexGameObject( new Vector2Int(c, r));
                     int randomIndex = GetRandomIndex(GetExcludedHextypes(hex));
                     hex.Initialize(new Vector2Int(c,r),  randomIndex);
                 }
@@ -59,11 +58,6 @@ namespace Hexagon
             }
 
             return excluding;
-        }
-        
-        int GetRandomIndex()
-        {
-            return Random.Range(0, GameManager.instance.hexPrefabs.Count);
         }
         
         int GetRandomIndex(HashSet<int> exclude)
