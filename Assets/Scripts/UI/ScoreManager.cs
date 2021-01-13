@@ -1,5 +1,6 @@
 ﻿using System;
 using Hexagon;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +10,7 @@ namespace UI
     {
         public static ScoreManager instance;
         
-        [SerializeField] private Text currentScoreText,
+        [SerializeField] private TextMeshProUGUI currentScoreText,
             highestScoreText;
         [SerializeField] public int scorePerHex = 5;
         public int currentScore { get; private set; }
@@ -37,7 +38,7 @@ namespace UI
             _highestScore = PlayerPrefs.GetInt(highestScoreKey, -1);
             if (_highestScore == -1)
             {
-                highestScoreText.text = "";
+                highestScoreText.SetText("");
             }
 
             GameManager.instance.onHexagonGroupExplode += OnScore;
@@ -58,7 +59,7 @@ namespace UI
         void SetCurrentScore(int score)
         {
             currentScore = score;
-            currentScoreText.text = currentScore.ToString();
+            currentScoreText.SetText(currentScore.ToString());
         }
         
         public void OnGameOver()
@@ -68,7 +69,7 @@ namespace UI
                 PlayerPrefs.SetFloat(highestScoreKey, currentScore);
                 PlayerPrefs.Save();
                 _highestScore = currentScore;
-                highestScoreText.text = _highScoreEmptyText + _highestScore;
+                highestScoreText.SetText(_highScoreEmptyText + _highestScore);;
             }
         }
     }

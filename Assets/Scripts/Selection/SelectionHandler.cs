@@ -17,11 +17,12 @@ namespace Selection
         private bool _isLeft;
         private Vector2 _rotationPoint;
 
-        public void SelectHex(Hex hex, HexagonVertexes hexagonVertex)
+        public bool SelectHex(Hex hex, HexagonVertexes hexagonVertex, out Vector2 position)
         {
             if (!GameManager.instance.canTakeAction)
             {
-                return;
+                position = Vector2.zero;
+                return false;
             }
             if (hexagonVertex == HexagonVertexes.BottomLeft)
             {
@@ -53,7 +54,13 @@ namespace Selection
             {
                 Destroy(_selectionGameObject);
             }
-            _selectionGameObject = Instantiate(_isLeft ? leftSelectionPrefab : rightSelectionPrefab, hex.transform.position, Quaternion.identity);
+
+            var hexTransform = hex.transform;
+            Vector2 hexagonSize = GameManager.instance.positionCalculator.hexagonSize;
+            position = hexTransform.position + new Vector3(0, -hexagonSize.y / 2);
+            position += _isLeft ? Vector2.zero : new Vector2(hexagonSize.x, 0);
+            _selectionGameObject = Instantiate(_isLeft ? leftSelectionPrefab : rightSelectionPrefab, hexTransform.position, Quaternion.identity);
+            return true;
         }
         
         void HandleRotate(bool clockwise)
