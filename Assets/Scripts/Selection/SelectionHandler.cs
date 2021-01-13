@@ -17,6 +17,20 @@ namespace Selection
         private bool _isLeft;
         private Vector2 _rotationPoint;
 
+        public void Start()
+        {
+            GameManager.instance.onRestart = OnRestart;
+        }
+
+        private void OnRestart()
+        {
+            if (_selectionGameObject)
+            {
+                Destroy(_selectionGameObject);
+                _selectedHex = null;
+            }
+        }
+
         public bool SelectHex(Hex hex, HexagonVertexes hexagonVertex, out Vector2 position)
         {
             if (!GameManager.instance.canTakeAction)
