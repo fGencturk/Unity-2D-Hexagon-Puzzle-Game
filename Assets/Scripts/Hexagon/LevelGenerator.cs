@@ -62,8 +62,8 @@ namespace Hexagon
         
         int GetRandomIndex(HashSet<int> exclude)
         {
-            var range = Enumerable.Range(0, GameManager.instance.hexPrefabs.Count).Where(i => !exclude.Contains(i));
-            int index = Random.Range(0, GameManager.instance.hexPrefabs.Count - exclude.Count);
+            var range = Enumerable.Range(0, GameManager.instance.hexSprites.Count).Where(i => !exclude.Contains(i));
+            int index = Random.Range(0, GameManager.instance.hexSprites.Count - exclude.Count);
             return range.ElementAt(index);
         }
     }

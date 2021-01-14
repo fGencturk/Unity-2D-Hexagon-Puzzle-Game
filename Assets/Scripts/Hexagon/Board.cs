@@ -9,12 +9,12 @@ namespace Hexagon
         // private Hex[,] _board and GetElement function achieves this behavior.
         // See Representation : https://pbs.twimg.com/media/Dd7Gk-FVQAEYryG.jpg "double-height"
         private Hex[,] _board;
-        private Vector2Int _boardSize;
+        public Vector2Int boardSize;
         
         public Board(Vector2Int boardSize)
         {
-            _boardSize = boardSize;
-            _board = new Hex[this._boardSize.y, this._boardSize.x];
+            this.boardSize = boardSize;
+            _board = new Hex[this.boardSize.y, this.boardSize.x];
         }
 
         public Hex GetElement(int row, int column)
@@ -37,6 +37,11 @@ namespace Hexagon
         public void SetElement(Vector2Int pos, Hex hex)
         {
             SetElement(pos.y, pos.x, hex);
+        }
+
+        public IEnumerable<Hex> GetTopRowIterator()
+        {
+            return new BoardTopRowIterator(this);
         }
     }
 }

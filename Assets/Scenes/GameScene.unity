@@ -204,12 +204,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30.75
+  m_fontSize: 34.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 120
+  m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -662,9 +662,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1032297470}
   - component: {fileID: 1032297469}
-  - component: {fileID: 1032297471}
   m_Layer: 0
-  m_Name: SwipeDetector
+  m_Name: TouchDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -696,18 +695,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1032297471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1032297468}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 839fdfa903bc4749bf5159bff8098003, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1102080958
 GameObject:
   m_ObjectHideFlags: 0
@@ -1022,6 +1009,7 @@ GameObject:
   - component: {fileID: 1422911309}
   - component: {fileID: 1422911312}
   - component: {fileID: 1422911311}
+  - component: {fileID: 1422911313}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1042,15 +1030,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canTakeAction: 0
-  hexPrefabs:
-  - {fileID: 5578019867964630824, guid: e95bb67222949d04a96306503a3253df, type: 3}
-  - {fileID: 5779457914614746158, guid: 498c39379333fce40b1424e0bb90d273, type: 3}
-  - {fileID: 6921224828694646312, guid: 708974d42697c6c47b8d3bcfa2eb599b, type: 3}
-  - {fileID: 3685482497940347818, guid: eed342384dfd5e24e99631532e18478a, type: 3}
-  - {fileID: 6627036843604879344, guid: 4a2fbe5c3e35cbe4caf3519eb38d1d27, type: 3}
+  hexTypesCount: 0
+  hexSprites:
+  - {fileID: 21300000, guid: af2bb5a038351c941899c8cf2f91d591, type: 3}
+  - {fileID: 21300000, guid: bc0b850b67cd9754eb7ad60dfe15ddef, type: 3}
+  - {fileID: 21300000, guid: 98eca2fbb2204e245bd0ac627b21d00f, type: 3}
+  - {fileID: 21300000, guid: 4f27196375193704a9c8b55c6141b965, type: 3}
+  - {fileID: 21300000, guid: d850c1cca8a24d04e9d382fed852ee0b, type: 3}
   bombWidgetPrefab: {fileID: 129788792773695944, guid: a94dbbf4468dece4ba235fd050192a4c,
     type: 3}
-  hexMoveAnimationDuration: 1
+  hexPrefab: {fileID: 3394128502851967851, guid: e95bb67222949d04a96306503a3253df,
+    type: 3}
   boardSize: {x: 8, y: 9}
   forceRewindAfterNoMatch: 1
   levelGenerator: {fileID: 1422911311}
@@ -1093,7 +1083,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 514823c764aa46d58fa2aec93f45f7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  createBombForEachScore: 100
+  createBombForEachScore: 1000
+--- !u!114 &1422911313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1422911308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e202309aac84b5d823d9350878a8728, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _delayAfterExplosion: 0.2
+  _delayAfterRound: 1.2
+  _hexMoveSpeed: 20
+  _hexMoveDelayForEachRow: 0.1
+  _rotationSpeed: 300
+  _delayAfterRotation: 0.2
 --- !u!224 &1670549872 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2376924578924543046, guid: 9b8acf18bc64d174296a52c33b7c1d9a,
@@ -1235,7 +1243,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: Game Over
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 0}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

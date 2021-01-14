@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Hexagon;
+using UnityEngine;
 
 namespace Utility
 {
@@ -8,6 +9,8 @@ namespace Utility
         public Vector2 hexagonSize { get; private set; }
         public Vector2 firstPosition { get; private set; }
         public Vector2 lastPosition { get; private set; }
+
+        public Vector2 selectionPoint;
 
         // It is fixed 0.75 value for uniform hexagons
         // It is the distance between LeftVertex and BottomRightVertex
@@ -27,7 +30,7 @@ namespace Utility
             return hexagonSize.x * _xDistanceMultiplier;
         }
 
-        public Vector2 GetPosition(Vector2Int indexes)
+        public Vector3 GetPosition(Vector2Int indexes)
         {
             return new Vector2(firstPosition.x + GetXDistanceBetweenNeighborColumns() * indexes.x, 
                 firstPosition.y - hexagonSize.y * indexes.y / 2);
@@ -36,6 +39,11 @@ namespace Utility
         public Vector2 GetBoardSizeInUnits()
         {
             return new Vector2(GetXDistanceBetweenNeighborColumns() * (boardSize.x - 1) + hexagonSize.x, hexagonSize.y * (boardSize.y + 0.5f));
+        }
+
+        public Vector2 GetSelectionPoint()
+        {
+            return selectionPoint;
         }
     }
 }

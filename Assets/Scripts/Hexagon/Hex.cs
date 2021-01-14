@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utility;
 
 namespace Hexagon
 {
@@ -10,41 +11,20 @@ namespace Hexagon
         public Vector2Int index { get; private set; }
         public int hexType { get; private set; }
 
+        public HexAnimator animator;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+
         public void Initialize(Vector2Int index, int hexType)
         {
             this.index = index;
             this.hexType = hexType;
-            this.name = "Hex (y:" + index.y + ", x:" + index.x + ") - Type :" + hexType;
             
-            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
-            SpriteRenderer targetRenderer = GameManager.instance.hexPrefabs[hexType].GetComponent<SpriteRenderer>();
-            renderer.sprite = targetRenderer.sprite;
+            _spriteRenderer.sprite = GameManager.instance.hexSprites[hexType];
         }
 
         public void ChangeIndex(Vector2Int index)
         {
             this.index = index;
-            this.name = "Hex (y:" + index.y + ", x:" + index.x + ") - Type :" + hexType;
-
-            StartCoroutine(MoveToPosition());
-        }
-
-        private IEnumerator MoveToPosition(Action onFinish = null)
-        {
-            float time = 0,
-                duration = GameManager.instance.hexMoveAnimationDuration;
-            Vector2 startPosition = transform.position;
-            
-            Vector2 newPosition = GameManager.instance.positionCalculator.GetPosition(index);
-            
-            while (time <= duration)
-            {
-                time += Time.deltaTime;
-                transform.position = Vector3.Lerp(startPosition, newPosition, time / duration);
-                yield return new WaitForEndOfFrame();
-            }
-            
-            onFinish?.Invoke();
         }
 
         public bool HasNeighborHex(HexagonEdges hexagonEdges)

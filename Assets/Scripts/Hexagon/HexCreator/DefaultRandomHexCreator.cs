@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using UI;
 using UnityEngine;
+using Utility;
 using Random = UnityEngine.Random;
 
 namespace Hexagon.HexCreator
 {
     public class DefaultRandomHexCreator : RandomHexCreator
     {
-        private float _screenHeight;
         [SerializeField] private int createBombForEachScore = 1000;
 
+        private HexPositionCalculator _hexPositionCalculator;
         private int _lastBombCreatedAt = 0;
+        private float _heightDifferenceToTop;
         private void Awake()
         {
-            _screenHeight = 2 * Camera.main.orthographicSize;
+            _hexPositionCalculator = GameManager.instance.positionCalculator;
+            Vector3 cameraTopPostion = Camera.main.ScreenToWorldPoint (new Vector3 (0, Screen.height, 0));
+            _hexPositionCalculator = GameManager.instance.positionCalculator;
+            _heightDifferenceToTop = cameraTopPostion.y - _hexPositionCalculator.lastPosition.y;
         }
 
         public override Hex CreateHexGameObject(Vector2Int indexes)
         {
-            List<GameObject> hexPrefabs = GameManager.instance.hexPrefabs;
-            int type = Random.Range(0, hexPrefabs.Count);
-            Vector2 position = GameManager.instance.positionCalculator.GetPosition(indexes) + new Vector2(0, _screenHeight);
-            GameObject hexGameObject = Instantiate(hexPrefabs[type], position, Quaternion.identity, transform) as GameObject;
-            Hex hex = hexGameObject.AddComponent<Hex>();
+            int type = Random.Range(0, GameManager.instance.hexTypesCount);
+            Vector2 position = GameManager.instance.positionCalculator.GetPosition(indexes) + new Vector3(0, _heightDifferenceToTop);
+            Hex hex = Instantiate(GameManager.instance.hexPrefab, position, Quaternion.identity, transform);
             if (ScoreManager.instance.currentScore >= _lastBombCreatedAt + createBombForEachScore)
             {
                 _lastBombCreatedAt += createBombForEachScore;
-                hexGameObject.AddComponent<Bomb>();
+                hex.gameObject.AddComponent<Bomb>();
             }
             hex.Initialize(indexes, type);
             return hex;

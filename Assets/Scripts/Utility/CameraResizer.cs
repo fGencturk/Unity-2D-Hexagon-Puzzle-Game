@@ -12,7 +12,7 @@ namespace Utility
         [SerializeField] [Tooltip("Horizontal margin to game board in %.")] private float horizontalMargin = 0.1f;
 
         // Start is called before the first frame update
-        void Start()
+        void Awake()
         {
             float screenRatio = Screen.width / (float)(Screen.height - rectTransform.rect.height);
             Vector2 boardSize = GameManager.instance.positionCalculator.GetBoardSizeInUnits();

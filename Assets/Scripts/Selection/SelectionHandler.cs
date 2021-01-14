@@ -73,6 +73,7 @@ namespace Selection
             Vector2 hexagonSize = GameManager.instance.positionCalculator.hexagonSize;
             position = hexTransform.position + new Vector3(0, -hexagonSize.y / 2);
             position += _isLeft ? Vector2.zero : new Vector2(hexagonSize.x, 0);
+            GameManager.instance.positionCalculator.selectionPoint = position;
             _selectionGameObject = Instantiate(_isLeft ? leftSelectionPrefab : rightSelectionPrefab, hexTransform.position, Quaternion.identity);
             return true;
         }

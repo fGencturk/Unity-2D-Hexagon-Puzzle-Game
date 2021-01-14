@@ -23,10 +23,11 @@ namespace Hexagon
         public static GameManager instance;
 
         [HideInInspector] public bool canTakeAction = false;
+        [HideInInspector] public int hexTypesCount;
         
-        [SerializeField] public List<GameObject> hexPrefabs;
+        [SerializeField] public List<Sprite> hexSprites;
         [SerializeField] public BombWidget bombWidgetPrefab;
-        [SerializeField] public float hexMoveAnimationDuration = 2f;
+        [SerializeField] public Hex hexPrefab;
         public HexPositionCalculator positionCalculator { get; private set; }
         
         [SerializeField] private Vector2Int boardSize = new Vector2Int(8,9);
@@ -40,9 +41,12 @@ namespace Hexagon
         public delegate void OnPlayerActionEndDelegate ();
         public event OnPlayerActionEndDelegate OnPlayerActionEnd = () => {};
         
-
         private Dictionary<int, Hex> _explodedHexs = new Dictionary<int, Hex>();
+        private Dictionary<int, ShiftedHex> _shiftedHexes = new Dictionary<int, ShiftedHex>();
+        private Dictionary<int, int> _columnToExplodedHexCount = new Dictionary<int, int>();
         private Board _board;
+        private int _lastCreatedRow,
+            _lastExplodedRow;
         
         public Hex GetElement(Vector2Int indexes)
         {
@@ -58,15 +62,25 @@ namespace Hexagon
                 return;
             }
             instance = this;
-            
+            hexTypesCount = hexSprites.Count;
             // Assuming all sprites have the same width and height
-            SpriteRenderer spriteRenderer = hexPrefabs[0].GetComponent<SpriteRenderer>();
+            SpriteRenderer spriteRenderer = hexPrefab.GetComponent<SpriteRenderer>();
             Vector2 hexagonSize = spriteRenderer.bounds.size;
+            _lastCreatedRow = boardSize.y * 2 - 1;
             
             positionCalculator = new HexPositionCalculator(boardSize, hexagonSize);
+        }
+
+        private void Start()
+        {
             Initialize();
         }
 
+        public IEnumerable<Hex> GetTopRowIterator()
+        {
+            return _board.GetTopRowIterator();
+        }
+        
         void Initialize()
         {
             _board = new Board(boardSize);
@@ -79,11 +93,9 @@ namespace Hexagon
         {
             List<Hex> neighbors = new List<Hex>();
             
-            for (int column = 0; column < boardSize.x; column++)
+            foreach (Hex topHex in GetTopRowIterator())
             {
-                int firstElementRow = column % 2 == 0 ? 0 : 1;
-                Hex element = _board.GetElement(firstElementRow, column);
-
+                Hex element = topHex;
                 while (true)
                 {
                     neighbors.Add(element);
@@ -156,6 +168,7 @@ namespace Hexagon
                 int nextIndex = (i + 1) % 3;
                 Vector2Int indexes = tempPositions[nextIndex];
                 _board.SetElement(indexes, hexs[i]);
+                hexs[i].animator.StartRotateAnimation(clockwise);
             }
             // Reverse rotation method will be invoked if there is no match
             void Reverse()
@@ -166,6 +179,7 @@ namespace Hexagon
                     {
                         Vector2Int indexes = tempPositions[i];
                         _board.SetElement(indexes, hexs[i]);
+                        hexs[i].animator.StartRotateAnimation(!clockwise);
                     }
                     
                 }
@@ -176,10 +190,10 @@ namespace Hexagon
 
         private IEnumerator HandleMove(Action onNoMatch = null)
         {
+            yield return new WaitForSeconds(AnimationData.delayAfterRotation);
             bool isThereMatch = false;
             do
             {
-                yield return new WaitForSeconds(hexMoveAnimationDuration);
                 FindAllExplodedHexs();
                 if (_explodedHexs.Count == 0)
                 {
@@ -195,9 +209,15 @@ namespace Hexagon
 
                 isThereMatch = true;
                 
-                ShiftBoard();
-                CreateNewHexes();
+                CalculateShifts();
+                CalculateNewHexagons();
                 DestroyExplodedHexes();
+                
+                yield return new WaitForSeconds(AnimationData.delayAfterExplosion);
+
+                TriggerShift();
+                
+                yield return new WaitForSeconds(AnimationData.delayAfterRound);
             } while (true);
 
             if (isThereMatch)
@@ -208,6 +228,30 @@ namespace Hexagon
             if (!IsThereAnyMoveLeft())
             {
                 TriggerGameOver();
+            }
+        }
+
+        private void TriggerShift()
+        {
+            
+            // Handle New Creation
+            foreach (var pair in _columnToExplodedHexCount)
+            {
+                int column = pair.Key;
+                int rowCount = pair.Value;
+                int startRow = column % 2 == 1 ? 1 : 0;
+                for (int row = startRow; row < rowCount * 2; row += 2)
+                {
+                    Vector2Int position = new Vector2Int(column, row);
+                    CreateHexGameObject(position);
+                }
+            }
+            _lastCreatedRow = boardSize.y * 2 - 1;
+            // Handle Shift
+            foreach (var shift in _shiftedHexes.Values)
+            {
+                Vector2Int newPosition = shift.hex.index + new Vector2Int(0, shift.shiftedRow * 2);
+                SetElementWithMoveAnimation(newPosition, shift.hex);
             }
         }
 
@@ -227,45 +271,46 @@ namespace Hexagon
             _explodedHexs.Clear();
         }
 
-        private void CreateNewHexes()
+        private void CalculateNewHexagons()
         {
             // Create new hexes for destroyed hexes
-            Dictionary<int, int> columnToExplodedHexCount = new Dictionary<int, int>();
+            _columnToExplodedHexCount.Clear();
             for (int i = 0; i < boardSize.x; i++)
             {
-                columnToExplodedHexCount[i] = 0;
+                _columnToExplodedHexCount[i] = 0;
             }
 
+            _lastCreatedRow = -1;
             foreach (var hex in _explodedHexs.Values)
             {
-                columnToExplodedHexCount[hex.index.x]++;
-            }
-
-            foreach (var pair in columnToExplodedHexCount)
-            {
-                int column = pair.Key;
-                int rowCount = pair.Value;
-                int startRow = column % 2 == 1 ? 1 : 0;
-                for (int row = startRow; row < rowCount * 2; row += 2)
+                _columnToExplodedHexCount[hex.index.x]++;
+                int row = _columnToExplodedHexCount[hex.index.x] * 2;
+                row += hex.index.x % 2 == 1 ? 1 : 0;
+                if (row > _lastCreatedRow)
                 {
-                    Vector2Int position = new Vector2Int(column, row);
-                    CreateHexGameObject(position);
+                    _lastCreatedRow = row;
                 }
             }
-            
+
         }
 
         public Hex CreateHexGameObject(Vector2Int position)
         {
             Hex hex = hexCreator.CreateHexGameObject(position);
-            _board.SetElement(position, hex);
+            SetElementWithMoveAnimation(position, hex);
             return hex;
         }
 
-        private void ShiftBoard()
+        public void SetElementWithMoveAnimation(Vector2Int position, Hex hex)
+        {
+            _board.SetElement(position, hex);
+            hex.animator.StartMoveAnimation(_lastCreatedRow);
+        }
+
+        private void CalculateShifts()
         {
             // Find all hexes which will shift
-            Dictionary<int, ShiftedHex> shiftedHexes = new Dictionary<int, ShiftedHex>();
+            _shiftedHexes.Clear();
             foreach (Hex hex in _explodedHexs.Values)
             {
                 Hex iteratedHex = hex;
@@ -279,13 +324,13 @@ namespace Hexagon
                         continue;
                     }
 
-                    if (shiftedHexes.ContainsKey(id))
+                    if (_shiftedHexes.ContainsKey(id))
                     {
-                        shiftedHexes[id].shiftedRow++;
+                        _shiftedHexes[id].shiftedRow++;
                     }
                     else
                     {
-                        shiftedHexes[id] = new ShiftedHex()
+                        _shiftedHexes[id] = new ShiftedHex()
                         {
                             hex = iteratedHex,
                             shiftedRow = 1
@@ -293,20 +338,13 @@ namespace Hexagon
                     }
                 }
             }
-            // Handle Shift
-            foreach (var shift in shiftedHexes.Values)
-            {
-                Vector2Int newPosition = shift.hex.index + new Vector2Int(0, shift.shiftedRow * 2);
-                _board.SetElement(newPosition, shift.hex);
-            }
         }
 
         private void FindAllExplodedHexs()
         {
-            for (int column = 0; column < boardSize.x; column++)
+            foreach (Hex topRowElement in GetTopRowIterator())
             {
-                int firstElementRow = column % 2 == 0 ? 0 : 1;
-                Hex element = _board.GetElement(firstElementRow, column);
+                Hex element = topRowElement;
 
                 while (true)
                 {
