@@ -19,7 +19,7 @@ namespace Selection
 
         public void Start()
         {
-            GameManager.instance.onRestart = OnRestart;
+            GameManager.instance.onRestart += OnRestart;
         }
 
         private void OnRestart()

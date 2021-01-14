@@ -35,9 +35,12 @@ namespace Hexagon
         [SerializeField] private LevelGenerator levelGenerator;
         [SerializeField] private RandomHexCreator hexCreator;
 
-        public UnityAction<int> onHexagonGroupExplode = delegate(int count) {  };
-        public UnityAction onGameOver = delegate() {  };
-        public UnityAction onRestart = delegate() {  };
+        public delegate void OnHexagonGroupExplode (int count);
+        public event OnHexagonGroupExplode onHexagonGroupExplode = (int a) => {};
+        public delegate void OnGameOverDelegate ();
+        public event OnGameOverDelegate onGameOver = () => {  };
+        public delegate void OnRestartDelegate ();
+        public event OnRestartDelegate onRestart = () => {  };
         public delegate void OnPlayerActionEndDelegate ();
         public event OnPlayerActionEndDelegate OnPlayerActionEnd = () => {};
         

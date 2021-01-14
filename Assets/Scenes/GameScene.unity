@@ -940,6 +940,16 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 2376924578924543047, guid: 9b8acf18bc64d174296a52c33b7c1d9a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1392779347}
+    - target: {fileID: 2376924578924543047, guid: 9b8acf18bc64d174296a52c33b7c1d9a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnRestart
+      objectReference: {fileID: 0}
     - target: {fileID: 2376924578924543065, guid: 9b8acf18bc64d174296a52c33b7c1d9a,
         type: 3}
       propertyPath: m_Name
@@ -1096,7 +1106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e202309aac84b5d823d9350878a8728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _delayAfterExplosion: 0.2
+  _delayAfterExplosion: 0.1
   _delayAfterRound: 1.2
   _hexMoveSpeed: 20
   _hexMoveDelayForEachRow: 0.1
